@@ -9,3 +9,15 @@ from plotly.subplots import make_subplots
 import threading
 import sys
 import os
+
+
+#抓資料
+def collect_data():
+    abspath = r'input/'
+    files   = os.listdir(abspath)
+    for file in files:
+        if 'EC' in file:
+            path       = abspath + file
+        elif '姓名' in file:
+            sales_list = abspath + file
+    return path, sales_list
