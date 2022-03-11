@@ -128,3 +128,80 @@ if __name__ == '__main__':
     Line_list = []
     part1     = threading.Thread(target = read_csv, args = (path,0,10),)
     part2     = threading.Thread(target = read_csv, args = (path,11,8190),)
+    part3     = threading.Thread(target = read_csv, args = (path,8191,100000),)
+    part4     = threading.Thread(target = read_csv, args = (path,100001,150000),)
+    part5     = threading.Thread(target = read_csv, args = (path,150001,200000),)
+    part6     = threading.Thread(target = read_csv, args = (path,200001,300000),)
+    part7     = threading.Thread(target = read_csv, args = (path,300001,400000),)
+    part8     = threading.Thread(target = read_csv, args = (path,400001,600000),)
+    part9     = threading.Thread(target = read_csv, args = (path,600001,800000),)
+    part10    = threading.Thread(target = read_csv, args = (path,800001,1000000),)
+    part11    = threading.Thread(target = read_csv, args = (path,1000001,1200000),)
+    part12    = threading.Thread(target = read_csv, args = (path,1200001,1400000),)
+    part13    = threading.Thread(target = read_csv, args = (path,1400001,1500000),)
+    part14    = threading.Thread(target = read_csv, args = (path,1500001,1600000),)
+    part15    = threading.Thread(target = read_csv, args = (path,1600001,1900000),)
+
+    part1.start()
+    part2.start()
+    part3.start()
+    part4.start()
+    part5.start()
+    part6.start()
+    part7.start()
+    part8.start()
+    part9.start()
+    part10.start()
+    part11.start()
+    part12.start()
+    part13.start()
+    part14.start()
+    part15.start()
+
+
+    part1.join()
+    part2.join()
+    part3.join()
+    part4.join()
+    part5.join()
+    part6.join()
+    part7.join()
+    part8.join()
+    part9.join()
+    part10.join()
+    part11.join()
+    part12.join()
+    part13.join()
+    part14.join()
+    part15.join()
+
+    #處理一些欄位的問題
+    read_df         = pd.DataFrame(Line_list)
+    read_df         = read_df[read_df[0] != '']
+    read_df.columns = ['交易類別','資料別','日期','扣款狀態','戶碼','基金代碼','基金簡稱','申購幣別','金額(非台幣)','金額(台幣)','是否為台股基金','[股/債/貨幣/平衡]',\
+        'Main_Code','EC_Code','Agent','[契約書號(For ROBO)]']
+    #因為用平行運算，所以不知道第一行(header)在哪裏，所以手動輸入column name並將原有header delete
+    read_df = read_df[read_df['扣款狀態'] != '扣款狀態']
+
+
+    #-------------------read file----------------#
+
+    #-----------------將我們需要的業務做成df，後續取出sales名稱做對照----------------------#
+    sales_df = get_sales(sales_list)
+    #-----------------將我們需要的業務做成df，後續取出sales名稱做對照----------------------#
+
+    #-----------------------------convert datetime----------------------------------#
+    read_df = column_convert(read_df)
+    #-----------------------------convert datetime----------------------------------#
+
+    #----------------------------filter tarde_type----------------------------------#
+    read_df_for_trade_type = trade_type_filter(read_df)
+    #----------------------------filter tarde_type----------------------------------#
+
+    #-------------------------------make picture------------------------------------#
+    make_all_agent_plot(read_df_for_trade_type)
+    #-------------------------------make picture------------------------------------#
+
+    #------------------------------make part picture--------------------------------#
+    make_all_agent_plot(read_df_for_trade_type,sales_df)
+    #------------------------------make part picture--------------------------------#
