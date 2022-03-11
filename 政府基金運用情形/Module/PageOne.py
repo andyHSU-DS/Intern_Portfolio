@@ -1,5 +1,5 @@
 import PyPDF2
-#import pdfplumber
+import pdfplumber
 import pandas as pd
 from openpyxl import load_workbook
 import re
@@ -12,7 +12,7 @@ for x in os.listdir(input_path):
         PDF_files.append(x)
 
 GFI  = pd.read_excel(r'input/202111 政府基金運用資訊 v2.0.xlsx',sheet_name = 'Government Fund Info (Raw Data)',skiprows = 2)
-
+# 
 #把index處理一下
 new_index = []
 old_index = GFI.set_index('Unnamed: 0').index
