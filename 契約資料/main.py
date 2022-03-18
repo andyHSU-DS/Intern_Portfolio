@@ -14,6 +14,7 @@ import sys
 import os
 import warnings
 warnings.filterwarnings('ignore')
+from module import Excel
 
 
 #抓資料
@@ -405,3 +406,11 @@ if __name__ == '__main__':
     #-------------n largest 扣款筆數standard deviation fund--------------------#
     redem_counts_std_large(read_df_for_trade_type, sales_df, 10, 5)
     #-------------n largest 扣款筆數standard deviation fund--------------------#
+
+    '''
+    excel = Excel()
+    wb    = excel.write_excel(df = 部分業務表現, line=True, table_style=False, table_style_name="TableStyleMedium9")
+    wb.save(r"output\輸出資料.xlsx")
+    excel.append_excel(r"output\輸出資料.xlsx",df=扣款金額,excel_sheet_name  = "金額")
+    excel.append_excel(r"output\輸出資料.xlsx",df=扣款筆數,excel_sheet_name  = "筆數")
+    '''
