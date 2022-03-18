@@ -1,6 +1,7 @@
 ###this code is for every agent's and fund's information
 
 #載入套件
+#目前資料3,000,000筆
 import plotly
 import plotly.express as px
 import pandas as pd
@@ -20,7 +21,7 @@ def collect_data():
     abspath = 'D:/My Documents/andyhs/桌面/Andy/契約資料/Input/'
     files = os.listdir(r'Input')
     for file in files:
-        if 'EC' in file:
+        if 'EC' and '2022' in file:
             path = abspath + file
         elif '姓名' in file:
             sales_list = abspath + file
@@ -165,7 +166,7 @@ def every_agent_each_fund(df, sales_list):
         fig.update_xaxes(tickangle=45,color='#2e2a2a')
         file = 'output/業務細項資料/'+sale+'個基金表現.html'
         fig.write_html(file)
-    return '業務個基金繪圖完成'
+    print('業務個基金繪圖完成')
 
 def make_fund_picture(df, sales_list):
     read_df_for_agent_trade_type = df[df['Agent'].isin(sales_list['姓名'].values)]
@@ -193,13 +194,14 @@ def make_fund_picture(df, sales_list):
             fig_subplots.add_trace(data_每期金額,row=1,col=1)
             fig_subplots.add_trace(data_每期扣款數量,row=2,col=1)
             fig_subplots.add_trace(data_每期變化,row=1,col=1)
-            fig_subplots.update_layout(height=600,width=900,title_text=fund+' data')
+            fig_subplots.update_layout(height=600,width=900,title_text=fund+' Information')
             file = 'output/基金細項資料/'+fund+'.html'
             fig_subplots.write_html(file)
         make_picture(fund_data)
-    return '基金作圖完成'
+    print('基金作圖完成')
 
-def std_large(df, sales_list, month_period,biggest=5):
+#扣款金額標準差排序
+def redem_sales_std_large(df, sales_list, month_period,biggest=5):
     std_list = []
     read_df_for_agent_trade_type = df[df['Agent'].isin(sales_list['姓名'].values)]
     data                         = read_df_for_agent_trade_type.groupby(['基金簡稱','日期']).agg({'金額(台幣)':'sum'})
@@ -208,14 +210,31 @@ def std_large(df, sales_list, month_period,biggest=5):
         temp_data.reset_index(drop=True,inplace=True)
         temp_data_period = temp_data.iloc[-month_period:]
         std              = temp_data_period['金額(台幣)'].std()
-        print(temp_data_period['金額(台幣)'].std())
         std_list.append([fund,std])
     std_df = pd.DataFrame(std_list,columns = ['Fund','Std'])
     std_df = std_df.sort_values(by='Std',ascending=False)
     std_df = std_df.iloc[:biggest+1]
-    file = 'output/ 前' + str(biggest) + '高標準差基金資訊 past' + str(month_period) + 'months.csv' 
+    file = 'output/ 每期扣款金額前' + str(biggest) + '高標準差基金資訊 past' + str(month_period) + 'months.csv' 
     std_df.to_csv(file,encoding='utf-8-sig',index=False,header=True)
-    return '標準差排序完成'
+    print('扣款金額標準差排序完成')
+
+#扣款筆數標準差排序
+def redem_counts_std_large(df, sales_list, month_period,biggest=5):
+    std_list = []
+    read_df_for_agent_trade_type = df[df['Agent'].isin(sales_list['姓名'].values)]
+    data                         = read_df_for_agent_trade_type.groupby(['基金簡稱','日期']).agg({'金額(台幣)':'sum','基金簡稱':'count'})
+    for fund in set(data.index.get_level_values(0)):
+        temp_data        = data.loc[fund]
+        temp_data.reset_index(drop=True,inplace=True)
+        temp_data_period = temp_data.iloc[-month_period:]
+        std              = temp_data_period['基金簡稱'].std()
+        std_list.append([fund,std])
+    std_df = pd.DataFrame(std_list,columns = ['Fund','Std'])
+    std_df = std_df.sort_values(by='Std',ascending=False)
+    std_df = std_df.iloc[:biggest+1]
+    file = 'output/ 每期扣款筆數前' + str(biggest) + '高標準差基金資訊 past' + str(month_period) + 'months.csv' 
+    std_df.to_csv(file,encoding='utf-8-sig',index=False,header=True)
+    print('扣款筆數標準差排序完成')
 
 
 if __name__ == '__main__':
@@ -237,6 +256,29 @@ if __name__ == '__main__':
     part13     = threading.Thread(target = read_csv,args=(path,1400001,1500000),)
     part14     = threading.Thread(target = read_csv,args=(path,1500001,1600000),)
     part15     = threading.Thread(target = read_csv,args=(path,1600001,1900000),)
+    part16     = threading.Thread(target = read_csv,args=(path,1900001,2000000,),)
+    part17     = threading.Thread(target = read_csv,args=(path,2000001,2100000,),)
+    part18     = threading.Thread(target = read_csv,args=(path,2100001,2200000),)
+    part19     = threading.Thread(target = read_csv,args=(path,2200001,2300000),)
+    part20    = threading.Thread(target = read_csv,args=(path,2300001,2400000),)
+    part21     = threading.Thread(target = read_csv,args=(path,2400001,2500000),)
+    part22     = threading.Thread(target = read_csv,args=(path,2500001,2600000),)
+    part23    = threading.Thread(target = read_csv,args=(path,2600001,2700000),)
+    part24     = threading.Thread(target = read_csv,args=(path,2700001,2800000),)
+    part25     = threading.Thread(target = read_csv,args=(path,2800001,2900000),)
+    part26     = threading.Thread(target = read_csv,args=(path,2900001,3000000),)
+    '''
+    part27     = threading.Thread(target = read_csv,args=(path,3000001,3100000),)
+    part28     = threading.Thread(target = read_csv,args=(path,3100001,3200000),)
+    part29     = threading.Thread(target = read_csv,args=(path,3200001,3300000),)
+    part30     = threading.Thread(target = read_csv,args=(path,3300001,3400000),)
+    part31     = threading.Thread(target = read_csv,args=(path,3400001,3500000),)
+    part32     = threading.Thread(target = read_csv,args=(path,3500001,3600000),)
+    part33     = threading.Thread(target = read_csv,args=(path,3600001,3700000),)
+    part34     = threading.Thread(target = read_csv,args=(path,3700001,3800000),)
+    part35     = threading.Thread(target = read_csv,args=(path,3800001,3900000),)
+    part36     = threading.Thread(target = read_csv,args=(path,3900001,4000000),)
+    '''
 
 
     part1.start()
@@ -254,6 +296,29 @@ if __name__ == '__main__':
     part13.start()
     part14.start()
     part15.start()
+    part16.start()
+    part17.start()
+    part18.start()
+    part19.start()
+    part20.start()
+    part21.start()
+    part22.start()
+    part23.start()
+    part24.start()
+    part25.start()
+    part26.start()
+    '''
+    part27.start()
+    part28.start()
+    part29.start()
+    part30.start()
+    part31.start()
+    part32.start()
+    part33.start()
+    part34.start()
+    part35.start()
+    part36.start()
+    '''
 
 
     part1.join()
@@ -271,7 +336,29 @@ if __name__ == '__main__':
     part13.join()
     part14.join()
     part15.join()
-
+    part16.join()
+    part17.join()
+    part18.join()
+    part19.join()
+    part20.join()
+    part21.join()
+    part22.join()
+    part23.join()
+    part24.join()
+    part25.join()
+    part26.join()
+    '''
+    part27.join()
+    part28.join()
+    part29.join()
+    part30.join()
+    part31.join()
+    part32.join()
+    part33.join()
+    part34.join()
+    part35.join()
+    part36.join()
+    '''
     #處理一些欄位的問題
     read_df = pd.DataFrame(Line_list)
     read_df = read_df[read_df[0]!='']
@@ -311,6 +398,10 @@ if __name__ == '__main__':
     make_fund_picture(read_df_for_trade_type,sales_df)
     #----------------make fund data info for each fund------------------------#
 
-    #----------------n largest standard deviation fund------------------------#
-    std_large(read_df_for_trade_type, sales_df, 10, 5)
-    #----------------n largest standard deviation fund------------------------#
+    #-------------n largest 扣款金額standard deviation fund--------------------#
+    redem_sales_std_large(read_df_for_trade_type, sales_df, 10, 5)
+    #-------------n largest 扣款金額standard deviation fund--------------------#
+
+    #-------------n largest 扣款筆數standard deviation fund--------------------#
+    redem_counts_std_large(read_df_for_trade_type, sales_df, 10, 5)
+    #-------------n largest 扣款筆數standard deviation fund--------------------#
