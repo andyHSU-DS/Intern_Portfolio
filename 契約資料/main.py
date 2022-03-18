@@ -172,7 +172,6 @@ def make_fund_picture(df, sales_list):
     fund_group_by_data           = read_df_for_agent_trade_type.groupby(['基金簡稱','日期']).agg({'金額(台幣)':'sum','基金簡稱':'count'})
     #找出所有基金
     for fund in set(fund_group_by_data.index.get_level_values(0)):
-        print(fund)
         #每個基金的資料
         fund_data           = fund_group_by_data.loc[fund]
         #計算累積金額
@@ -199,6 +198,24 @@ def make_fund_picture(df, sales_list):
             fig_subplots.write_html(file)
         make_picture(fund_data)
     return '基金作圖完成'
+
+def std_large(df, sales_list, month_period,biggest=5):
+    std_list = []
+    read_df_for_agent_trade_type = df[df['Agent'].isin(sales_list['姓名'].values)]
+    data                         = read_df_for_agent_trade_type.groupby(['基金簡稱','日期']).agg({'金額(台幣)':'sum'})
+    for fund in set(data.index.get_level_values(0)):
+        temp_data        = data.loc[fund]
+        temp_data.reset_index(drop=True,inplace=True)
+        temp_data_period = temp_data.iloc[-month_period:]
+        std              = temp_data_period['金額(台幣)'].std()
+        print(temp_data_period['金額(台幣)'].std())
+        std_list.append([fund,std])
+    std_df = pd.DataFrame(std_list,columns = ['Fund','Std'])
+    std_df = std_df.sort_values(by='Std',ascending=False)
+    std_df = std_df.iloc[:biggest+1]
+    file = 'output/ 前' + str(biggest) + '高標準差基金資訊 past' + str(month_period) + 'months.csv' 
+    std_df.to_csv(file,encoding='utf-8-sig',index=False,header=True)
+    return '標準差排序完成'
 
 
 if __name__ == '__main__':
@@ -293,3 +310,7 @@ if __name__ == '__main__':
     #----------------make fund data info for each fund------------------------#
     make_fund_picture(read_df_for_trade_type,sales_df)
     #----------------make fund data info for each fund------------------------#
+
+    #----------------n largest standard deviation fund------------------------#
+    std_large(read_df_for_trade_type, sales_df, 10, 5)
+    #----------------n largest standard deviation fund------------------------#
