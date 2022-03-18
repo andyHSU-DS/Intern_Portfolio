@@ -102,8 +102,8 @@ def column_convert(df,column_name='日期',period="M"):
 
 
 #過濾你想看的交易類別，目前是預設RSP
-def trade_type_filter(df,type='RSP'):
-    df = df[df['交易類別'] == 'RSP']
+def trade_type_filter(df,type):
+    df = df[df['交易類別'].isin(type)]
     df.reset_index(drop=True,inplace=True)
     return df
 
@@ -111,7 +111,7 @@ def trade_type_filter(df,type='RSP'):
 def make_all_agent_plot(df):
     df = df.groupby(['Agent','日期']).agg({'金額(台幣)':'sum'})
     picture = px.line(x=df.index.get_level_values(1).to_timestamp(),y=df['金額(台幣)'],color=df.index.get_level_values(0),\
-    labels={'x':'日期','y':'扣款金額(NTD)','color':'業務'},title='RSP扣款金額')
+    labels={'x':'日期','y':'扣款金額(NTD)','color':'業務'},title='RSP/ARSP/CRSP扣款金額')
     print('繪圖完成(all agents)')
     picture.write_html(file= r'output/全體業務RSP表現.html')
 
@@ -122,7 +122,7 @@ def make_agent_plot(df,sales_df):
     df_pic = df[df['Agent'].isin(sales_df['姓名'].values)]
     df_pic_re_index = df_pic.set_index('日期')
     picture = px.line(x=df_pic_re_index.index.to_timestamp(),y=df_pic_re_index['金額(台幣)'],color=df_pic_re_index['Agent'],\
-    labels={'x':'日期','y':'扣款金額(NTD)','color':'業務'},title='RSP扣款金額')
+    labels={'x':'日期','y':'扣款金額(NTD)','color':'業務'},title='RSP/ARSP/CRSP扣款金額')
     print('繪圖完成(part agents)')
     picture.write_html(file= r'output/部分業務RSP表現.html')
     #-------------做csv-----------------#
@@ -379,7 +379,7 @@ if __name__ == '__main__':
     #----------------------convert datetime-----------------------------#
 
     #--------------------------filter trade_type-------------------------#
-    read_df_for_trade_type = trade_type_filter(read_df)#過濾
+    read_df_for_trade_type = trade_type_filter(read_df,['RSP','ARSP','CRSP'])#過濾
     #--------------------------filter trade_type-------------------------#
 
     #--------------------------make picture------------------------------#
