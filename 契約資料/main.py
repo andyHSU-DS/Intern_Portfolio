@@ -1,7 +1,7 @@
 ###this code is for every agent's and fund's information
 
 #載入套件
-#目前資料3,000,000筆
+#目前資料2,700,000筆
 import plotly
 import plotly.express as px
 import pandas as pd
@@ -237,6 +237,37 @@ def redem_counts_std_large(df, sales_list, month_period,biggest=5):
     std_df.to_csv(file,encoding='utf-8-sig',index=False,header=True)
     print('扣款筆數標準差排序完成')
 
+#畫tree_map
+def Tree_Map(df,sales_list):
+    read_df_for_agent_trade_type = df[df['Agent'].isin(sales_list['姓名'].values)]
+    data                         = read_df_for_agent_trade_type.groupby(['基金簡稱','日期','Agent']).agg({'金額(台幣)':'sum'})
+    data2                        = read_df_for_agent_trade_type.groupby('基金簡稱').agg({'金額(台幣)':'std'})
+    data.reset_index(inplace=True)
+    data2.reset_index(inplace=True)
+    data3 = data.merge(data2,left_on='基金簡稱',right_on='基金簡稱',how='left')
+
+    data3 = data3.rename(columns={
+    '金額(台幣)_x':'金額(台幣)',
+    '金額(台幣)_y':'標準差'
+    })
+    fig = px.treemap(
+        data3,
+        path = ['基金簡稱','日期','Agent'],
+        values = '金額(台幣)',
+        color = '標準差',
+        range_color = [data3['標準差'].min(),data3['標準差'].max()],
+        hover_data = {'金額(台幣)':'.2%'},
+        height = 1080,
+        width = 1920,
+        color_continuous_scale = 'Geyser',
+        color_continuous_midpoint = data3['標準差'].mean()
+    )
+
+    fig.update_traces(textinfo = 'label+value',textfont = dict(size=24))
+    fig.write_html('output/tree_map.html')
+    print('tree map complete')
+    return None
+
 
 if __name__ == '__main__':
     path, sales_list = collect_data()
@@ -407,10 +438,8 @@ if __name__ == '__main__':
     redem_counts_std_large(read_df_for_trade_type, sales_df, 10, 5)
     #-------------n largest 扣款筆數standard deviation fund--------------------#
 
-    '''
-    excel = Excel()
-    wb    = excel.write_excel(df = 部分業務表現, line=True, table_style=False, table_style_name="TableStyleMedium9")
-    wb.save(r"output\輸出資料.xlsx")
-    excel.append_excel(r"output\輸出資料.xlsx",df=扣款金額,excel_sheet_name  = "金額")
-    excel.append_excel(r"output\輸出資料.xlsx",df=扣款筆數,excel_sheet_name  = "筆數")
-    '''
+    #--------------------draw the tree map------------------------------------#
+    Tree_Map(read_df_for_trade_type,sales_df)
+    #--------------------draw the tree map------------------------------------#
+
+    
