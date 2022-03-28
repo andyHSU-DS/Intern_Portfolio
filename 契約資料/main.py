@@ -43,7 +43,8 @@ def read_csv(File_Path,start,end,encoding='utf-8-sig'):
         with open(File_Path,'r',encoding=encoding) as file_reader:
             while True:
                 #print('目前:',i)
-                line = file_reader.readline().replace("\n",'').replace("\t",'').replace('晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD 月配)')\
+                line = file_reader.readline().replace("\n",'').replace("\t",'')\
+                    .replace('晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD 月配)')\
                     .replace('晉達環球高收益債券基金 C 收益-2 股份 (澳幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-2 股份 (澳幣避險 IRD 月配)')\
                     .replace('晉達環球動力股息基金 C 收益-2 股份 (南非幣避險 IRD, 月配)','晉達環球動力股息基金 C 收益-2 股份 (南非幣避險 IRD 月配)').split(',')
                 #如果在範圍內，就要抓每行
@@ -64,7 +65,8 @@ def read_csv(File_Path,start,end,encoding='utf-8-sig'):
         with open(File_Path,'r',encoding='big5') as file_reader:
             while True:
                 #print('目前:',i)
-                line = file_reader.readline().replace("\n",'').replace("\t",'').replace('晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD 月配)')\
+                line = file_reader.readline().replace("\n",'').replace("\t",'')\
+                    .replace('晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-3 股份 (南非幣避險 IRD 月配)')\
                     .replace('晉達環球高收益債券基金 C 收益-2 股份 (澳幣避險 IRD, 月配)','晉達環球高收益債券基金 C 收益-2 股份 (澳幣避險 IRD 月配)')\
                     .replace('晉達環球動力股息基金 C 收益-2 股份 (南非幣避險 IRD, 月配)','晉達環球動力股息基金 C 收益-2 股份 (南非幣避險 IRD 月配)').split(',')
                 #如果在範圍內，就要抓每行
@@ -135,9 +137,18 @@ def every_agent_each_fund(df, sales_list):
     read_df_for_agent_trade_type_group = read_df_for_agent_trade_type.groupby(['Agent','基金簡稱']).agg({'金額(非台幣)':'sum'})
     for sale in sales_list['姓名'].values:
         one_agent_data = read_df_for_agent_trade_type_group.loc[sale].sort_values('金額(非台幣)',ascending=False)
+        color = []
+        #用顏色區別表現
+        for i in range(len(one_agent_data)):
+            if i < 5:
+                color.append('#cc0000')
+            elif i < 10:
+                color.append('#f6b26b')
+            else:
+                color.append('#6fa8dc')
         data = go.Bar(y=list(one_agent_data['金額(非台幣)']),x=one_agent_data.index,orientation='v',\
         marker = {
-            'color':'#ca3535',
+            'color':color,
             },\
         textfont = {
             'color':'#ed3cca'
@@ -183,7 +194,8 @@ def make_fund_picture(df, sales_list):
         def make_picture(fund_data):
             fig_subplots = make_subplots(rows=2, cols=1,subplot_titles=['扣款金額及變化量','筆數'],\
             row_heights=[0.7,0.3])
-            data_每期金額 = go.Scatter(x=fund_data.index.to_timestamp(),y=fund_data['金額(台幣)'].values,mode='lines+markers',name='每期金額',marker_color='#00b3f4')
+            data_每期金額 = go.Scatter(x=fund_data.index.to_timestamp(),y=fund_data['金額(台幣)'].values\
+                ,mode='lines+markers',name='每期金額',marker_color='#00b3f4')
             data_每期變化 = go.Scatter(x=fund_data.index.to_timestamp(),y=fund_data['變化'].values,mode='lines+markers',name='每期變化(比較前期)')
             data_每期扣款數量 = go.Bar(y=list(fund_data['基金簡稱']),x=fund_data.index.to_timestamp(),orientation='v',\
             marker = {
