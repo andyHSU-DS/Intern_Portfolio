@@ -77,7 +77,7 @@ def C_I_process():
         total_top5_fund = np.vstack([MTD_page_Top5_Fund.values,YTD_page_Top5_Fund_new])
         top5_fund_df    = pd.DataFrame(total_top5_fund)
         return top5_fund_df 
-
+        
     def C_I_Promo_and_Focus_Fund():
         MTD_page_Top5_Fund    = pd.read_excel(MTD,sheet_name='Promotion and Focus Fund')
         #因為我們只要total之後的資料，所以先找到total的index

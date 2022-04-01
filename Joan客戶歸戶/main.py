@@ -1,6 +1,6 @@
 import pandas as pd
 import os 
-from tqdm import tqdm
+#from tqdm import tqdm
 import numpy as np
 def Joan_客戶歸戶():
     file_path = os.getcwd()+'/input'
@@ -79,11 +79,11 @@ def Joan_客戶歸戶():
                 need_space_list.append(i)
         
         print(len(need_space_list))
-        for i in tqdm(need_space_list):
+        for i in need_space_list:
             df_gp.iloc[i,[0,1]]=['','']
 
         print(len(need_account_number_space_list))
-        for i in tqdm(need_account_number_space_list):
+        for i in need_account_number_space_list:
             df_gp.iloc[i,0]=['']
             
         NMMF_grade_stat = pd.DataFrame(df_gp['NMMF等級'].value_counts())
